@@ -114,9 +114,25 @@ def show_evaluation(model, test_data: pd.DataFrame):
     st.dataframe(report.round(3), use_container_width=True)
 
 
+def compare_all_models(test_data: pd.DataFrame) -> pd.DataFrame:
+    """Evaluate every available saved model against the same uploaded test data."""
+    features, target = prepare_test_data(test_data)
+    comparison_rows = []
+
+    for model_name, filename in MODEL_FILES.items():
+        path = MODEL_DIR / filename
+        if not path.exists():
+            continue
+        model = load_model(str(path))
+        _, metrics = evaluate_model(model, features, target)
+        comparison_rows.append({"Model": model_name, **metrics})
+
+    return pd.DataFrame(comparison_rows).set_index("Model")
+
+
 st.set_page_config(page_title="Wine Classification", page_icon="🍷", layout="wide")
 st.title("🍷 Wine Classification")
-st.write("Evaluate trained classifiers using a CSV containing **test data only**.")
+st.caption("Compare five machine-learning classifiers using a CSV containing **test data only**.")
 
 with st.sidebar:
     st.header("Model Selection")
@@ -152,8 +168,17 @@ with st.expander("Preview test data"):
     st.dataframe(test_data.head(), use_container_width=True)
 
 try:
+    st.header(f"Selected Model: {selected_name}")
     show_evaluation(classifier, test_data)
 except ValueError as error:
     st.error(str(error))
 except Exception as error:
     st.error(f"Evaluation failed. Confirm that this test CSV matches the training features. Details: {error}")
+
+try:
+    st.header("Model Comparison")
+    st.write("All available trained models evaluated on the same test data.")
+    comparison = compare_all_models(test_data)
+    st.dataframe(comparison.style.format("{:.3f}").highlight_max(axis=0, color="#d9ead3"), use_container_width=True)
+except Exception as error:
+    st.warning(f"The full model comparison could not be displayed: {error}")
