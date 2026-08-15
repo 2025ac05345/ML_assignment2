@@ -21,7 +21,7 @@ from sklearn.metrics import (
 
 PROJECT_DIR = Path(__file__).parent
 MODEL_DIR = PROJECT_DIR / "model"
-DEFAULT_TEST_DATA = PROJECT_DIR / "test_data.csv"
+DEFAULT_TEST_DATA = PROJECT_DIR / "processed_data" / "test_data.csv"
 MODEL_FILES = {
     "Logistic Regression": "logistic_regression.joblib",
     "Decision Tree": "decision_tree.joblib",
@@ -142,7 +142,7 @@ if uploaded_file is not None:
     source_name = uploaded_file.name
 elif DEFAULT_TEST_DATA.exists():
     test_data = pd.read_csv(DEFAULT_TEST_DATA)
-    source_name = "test_data.csv"
+    source_name = "processed_data/test_data.csv"
 else:
     st.info("Upload a test CSV to evaluate the selected model.")
     st.stop()
