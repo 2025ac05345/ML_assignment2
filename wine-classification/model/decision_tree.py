@@ -54,7 +54,7 @@ def build_pipeline(x_train: pd.DataFrame) -> Pipeline:
     classifier = DecisionTreeClassifier(
         class_weight="balanced",
         max_depth=8,
-        min_samples_leaf=10,
+        min_samples_leaf=20,
         random_state=RANDOM_STATE,
     )
     return Pipeline(steps=[("preprocessor", preprocessor), ("classifier", classifier)])
